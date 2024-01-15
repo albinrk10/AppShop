@@ -76,7 +76,7 @@ class _LoginForm extends ConsumerWidget {
       child: Column(
         children: [
           const SizedBox(height: 50),
-          Text('Login', style: textStyles.titleLarge),
+          Text('Inciar sesion', style: textStyles.titleLarge),
           const SizedBox(height: 90),
           CustomTextFormField(
             label: 'Correo',
