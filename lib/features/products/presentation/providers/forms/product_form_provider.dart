@@ -4,6 +4,19 @@ import 'package:teslo_shop/config/config.dart';
 import '../../../../shared/shared.dart';
 import '../../../domian/domain.dart';
 
+final productFormProvider = StateNotifierProvider.autoDispose
+    .family<ProductFormNotifier, ProductFormState, Product>(
+  (ref,product) {
+
+    //TODO: createUpdateCallback
+    
+    return ProductFormNotifier(
+      product: product,
+      //TODO: onSubmitCallback
+      );
+  },
+);
+
 class ProductFormNotifier extends StateNotifier<ProductFormState> {
   final void Function(Map<String, dynamic> productLike)? onSubmitCallback;
 
@@ -27,7 +40,9 @@ class ProductFormNotifier extends StateNotifier<ProductFormState> {
     _tocheEveryThing();
 
     if (!state.isFormVaild) return false;
-    if (onSubmitCallback == null) return false;
+    //TODO regresar
+    // if (onSubmitCallback == null) return false;
+
     final productLike = {
       'id': state.id,
       'title': state.title.value,
@@ -45,6 +60,7 @@ class ProductFormNotifier extends StateNotifier<ProductFormState> {
     };
     //
     return true;
+
   }
 
   void _tocheEveryThing() {

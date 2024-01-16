@@ -42,6 +42,8 @@ class ProductsNotifier extends StateNotifier<ProductsState> {
   }
 }
 
+
+
 //State Notifier Provider
 class ProductsState {
   final bool isLastPage;
