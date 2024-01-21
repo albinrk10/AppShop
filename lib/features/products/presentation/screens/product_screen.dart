@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:teslo_shop/features/products/domian/domain.dart';
@@ -27,7 +29,29 @@ class ProductSreen extends ConsumerWidget {
             title: const Text('Editar Producto'),
             actions: [
               IconButton(
-                  onPressed: () {}, icon: const Icon(Icons.camera_alt_outlined))
+                  onPressed: () async {
+                    final photoPath =
+                        await CameraGalleryServiceImpl().selectPhoto();
+                    if (photoPath == null) return;
+                    ref
+                        .read(
+                            productFormProvider(productState.product!).notifier)
+                        .updateProductImage(photoPath);
+                    photoPath;
+                  },
+                  icon: const Icon(Icons.photo_library_outlined)),
+              IconButton(
+                  onPressed: () async {
+                    final photoPath =
+                        await CameraGalleryServiceImpl().takePhoto();
+                    if (photoPath == null) return;
+                    ref
+                        .read(
+                            productFormProvider(productState.product!).notifier)
+                        .updateProductImage(photoPath);
+                    photoPath;
+                  },
+                  icon: const Icon(Icons.camera_alt_outlined)),
             ],
           ),
           body: productState.isLoading
@@ -36,14 +60,14 @@ class ProductSreen extends ConsumerWidget {
           floatingActionButton: FloatingActionButton(
             onPressed: () {
               if (productState.product == null) return;
-    
+
               ref
                   .read(productFormProvider(productState.product!).notifier)
                   .onFormSubmit()
                   .then((value) {
-                    if (!value) return;
-                    showSnackBar(context);
-                  });
+                if (!value) return;
+                showSnackBar(context);
+              });
             },
             child: const Icon(Icons.save_as_outlined),
           )),
@@ -194,7 +218,7 @@ class _SizeSelector extends StatelessWidget {
       }).toList(),
       selected: Set.from(selectedSizes),
       onSelectionChanged: (newSelection) {
-      FocusScope.of(context).unfocus();
+        FocusScope.of(context).unfocus();
         print(newSelection);
         onSizeChanged(List.from(newSelection));
       },
@@ -245,24 +269,40 @@ class _ImageGallery extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (images.isEmpty) {
+      ClipRRect(
+          borderRadius: const BorderRadius.all(Radius.circular(20)),
+          child: Image.asset('assets/images/no-image.jpg', fit: BoxFit.cover));
+    }
     return PageView(
       scrollDirection: Axis.horizontal,
       controller: PageController(viewportFraction: 0.7),
-      children: images.isEmpty
-          ? [
-              ClipRRect(
+      children: 
+           images.map((image) {
+
+              late ImageProvider imageProvider;
+              if(image.startsWith('http')){
+                imageProvider = NetworkImage(image);
+              }else{
+                imageProvider = FileImage(File(image));
+              }  
+
+
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal:10 ),
+                child: ClipRRect(
                   borderRadius: const BorderRadius.all(Radius.circular(20)),
-                  child: Image.asset('assets/images/no-image.jpg',
-                      fit: BoxFit.cover))
-            ]
-          : images.map((e) {
-              return ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(20)),
-                child: Image.network(
-                  e,
-                  fit: BoxFit.cover,
+                  child: FadeInImage(
+                    fit: BoxFit.cover,
+                    image: imageProvider,
+                    placeholder: const AssetImage('assets/loaders/bottle-loader.gif'),
+                    
+                    
+                  ),
                 ),
               );
+
+
             }).toList(),
     );
   }

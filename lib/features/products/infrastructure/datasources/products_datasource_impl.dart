@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/widgets.dart';
 import 'package:teslo_shop/config/config.dart';
 import '../../domian/domain.dart';
 import '../errors/product_errors.dart';
@@ -14,13 +15,47 @@ class ProductsDatasourceImpl extends ProductsDatasource {
             baseUrl: Environment.apiUrl,
             headers: {'Authorization': 'Bearer $accessToken'}));
 
+  Future<String> _uploadFile(String path) async {
+    try {
+      final fileName = path.split('/').last;
+      final FormData data = FormData.fromMap(
+          {'file': MultipartFile.fromFileSync(path, filename: fileName)});
+
+      final respose = await dio.post(
+        '/files/product',
+        data: data,
+      );
+      return respose.data['image'];
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
+  Future<List<String>> _uploadPhotos(List<String> photos) async {
+    final photosToUpload =
+        photos.where((element) => element.contains('/')).toList();
+    final photosToIgnore =
+        photos.where((element) => !element.contains('/')).toList();
+
+    //TODO: crear una serie dse Futures de carga de imagenes
+    final List<Future<String>> uploadJob =
+        photosToUpload.map(_uploadFile).toList();
+    final newImages = await Future.wait(uploadJob);
+
+    return [...photosToIgnore, ...newImages];
+  }
+
   @override
   Future<Product> createUpdateProduct(Map<String, dynamic> productLike) async {
     try {
       final String? productId = productLike['id'];
       final String method = (productId == null) ? 'POST' : 'PATCH';
-      final String url = (productId == null) ? '/products' : '/products/$productId';
+      final String url =
+          (productId == null) ? '/products' : '/products/$productId';
+
       productLike.remove('id');
+      productLike['images'] = await _uploadPhotos(productLike['images']);
+
       final response = await dio.request(
         url,
         data: productLike,
