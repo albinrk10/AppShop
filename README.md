@@ -17,3 +17,4 @@ Este es un proyecto para trabajar con:
 Recuerden leer y seguir la guía para montar el backend localmente.
 
 # AppShop
+![Screenshot_1705372447](https://github.com/albinrk10/AppShop/assets/79820950/9332a199-e659-4460-801b-e07cbfbc0aee)
