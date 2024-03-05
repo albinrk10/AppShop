@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 
 
 class CustomTextFormField extends StatelessWidget {
-
   final String? label;
   final String? hint;
   final String? errorMessage;
   final bool obscureText;
   final TextInputType? keyboardType;
   final Function(String)? onChanged;
+  final Function(String)? onFieldSubmitted;
   final String? Function(String?)? validator;
 
   const CustomTextFormField({
@@ -20,6 +20,7 @@ class CustomTextFormField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.onChanged, 
     this.validator, 
+    this.onFieldSubmitted
   });
 
   @override
@@ -50,6 +51,7 @@ class CustomTextFormField extends StatelessWidget {
       child: TextFormField(
         onChanged: onChanged,
         validator: validator,
+        onFieldSubmitted: onFieldSubmitted ,
         obscureText: obscureText,
         keyboardType: keyboardType,
         style: const TextStyle( fontSize: 20, color: Colors.black54 ),
